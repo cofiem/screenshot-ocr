@@ -4,7 +4,7 @@ import logging
 def run():
     logging.basicConfig(
         format="%(asctime)s [%(levelname)-8s] %(message)s",
-        level=logging.DEBUG,
+        level=logging.INFO,
     )
 
     from screenshot_ocr import cli

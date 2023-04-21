@@ -82,9 +82,3 @@ def find_ff_screenshot_files(image_dir: pathlib.Path):
             continue
 
         yield file_path
-
-
-def arrange_image_file_text(
-    input_file: pathlib.Path, output_dir: pathlib.Path, image_text: str
-) -> None:
-    pass

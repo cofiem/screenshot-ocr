@@ -1,2 +1,5 @@
+pip
+setuptools
+wheel
 black
 pyoxidizer

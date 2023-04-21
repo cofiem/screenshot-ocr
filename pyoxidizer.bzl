@@ -28,6 +28,17 @@ def make_exe():
         packages=["screenshot_ocr"],
     ))
 
+    # add Pypi packages
+    exe.add_python_resources(
+    exe.pip_install(
+        [
+        "google-api-python-client",
+        "google-auth-httplib2",
+        "google-auth-oauthlib"
+        ]
+        )
+        )
+
     # Return our `PythonExecutable` instance so it can be built and
     # referenced by other consumers of this target.
     return exe
@@ -54,7 +65,7 @@ def make_msi(exe):
         # The name of your application.
         "Screenshot OCR",
         # The version of your application.
-        "0.1.0",
+        "0.2.0",
         # The author/manufacturer of your application.
         "Mark C"
     )
@@ -80,3 +91,5 @@ register_target("msi_installer", make_msi, depends=["exe"])
 # Resolve whatever targets the invoker of this configuration file is requesting
 # be resolved.
 resolve_targets()
+
+# build a release binary: `pyoxidizer.exe build --release`

@@ -2,16 +2,16 @@ import argparse
 import logging
 import pathlib
 import shutil
-import sys
 import typing
 
-from screenshot_ocr import tesseract, files
+from screenshot_ocr import tesseract, files, sheets, trivia
 
 logger = logging.getLogger(__name__)
 
 
 def build_args(args: list[str] = None) -> argparse.Namespace:
-    # prog is set for pyOxidizer, due to issue: https://github.com/indygreg/PyOxidizer/issues/307
+    # prog is set for pyOxidizer, due to issue:
+    # https://github.com/indygreg/PyOxidizer/issues/307
     parser = argparse.ArgumentParser(
         description="Extract text from screenshots.", prog="screenshot-ocr"
     )
@@ -38,7 +38,24 @@ def build_args(args: list[str] = None) -> argparse.Namespace:
     parser.add_argument(
         "--no-move-images",
         action="store_true",
-        help="don't move image files to the output directory (image files are moved by default)",
+        help="don't move image files to the output directory "
+        "(image files are moved by default)",
+    )
+    parser.add_argument(
+        "--credentials-file",
+        type=pathlib.Path,
+        required=True,
+        help="path to the credentials file",
+    )
+    parser.add_argument(
+        "--token-file",
+        type=pathlib.Path,
+        help="path to the token file",
+    )
+    parser.add_argument(
+        "--spreadsheet-id",
+        required=True,
+        help="the spreadsheet id",
     )
     result = parser.parse_args(args)
     return result
@@ -89,6 +106,11 @@ def norm_args(args: list[str] = None):
     if not output_dir:
         output_dir = documents_dir_guess / "Tesseract"
 
+    # trivia args
+    credentials_path = parsed_args.credentials_file
+    token_path = parsed_args.token_file
+    ss_id = parsed_args.spreadsheet_id
+
     logger.info(f"Using Tesseract executable: '{tesseract_exe}'.")
     logger.info(f"Using Tesseract data: '{tesseract_data}'.")
     logger.info(f"Using input directory: '{input_dir}'.")
@@ -100,6 +122,9 @@ def norm_args(args: list[str] = None):
         "input_dir": input_dir,
         "output_dir": output_dir,
         "no_move_images": parsed_args.no_move_images,
+        "credentials_file": credentials_path,
+        "token_path": token_path,
+        "spreadsheet_id": ss_id,
     }
 
 
@@ -124,26 +149,42 @@ def run_program(args: list[str] = None) -> None:
     output_dir = normalised_arguments["output_dir"]
     move_images = not normalised_arguments["no_move_images"]
 
+    credentials_path = normalised_arguments["credentials_file"]
+    token_path = normalised_arguments["token_path"]
+    ss_id = normalised_arguments["spreadsheet_id"]
+
+    ss_client = sheets.GoogleSheetsClient(credentials_path, token_path)
+
     if not output_dir.exists():
         output_dir.mkdir(parents=True, exist_ok=True)
 
     count = 0
 
     # find the image files and extract the text from each
-    for image_file, output_text in get_image_text(
-        tesseract_exe, tesseract_data, input_dir
-    ):
+    image_text_outcome = get_image_text(tesseract_exe, tesseract_data, input_dir)
+    for image_file, output_text in image_text_outcome:
         if move_images:
             # move the image file to the output dir
             shutil.move(image_file, output_dir / image_file.name)
 
-        # create a text file with the same name as the image file that contains the extracted text
+        # create a text file with the same name as the image file
+        # that contains the extracted text
         (output_dir / image_file.stem).with_suffix(".txt").write_text(output_text)
-
-        # print the image file name and extracted text to stdout
-        logger.info(f"{image_file.name}: {output_text}")
-
         count += 1
+
+        # extract the question number
+        question_number, question_text = trivia.extract_question_number_text(
+            output_text
+        )
+
+        # print the image file name and extracted question number and text to stdout
+        logger.info(f'"{image_file.name}": Q{question_number}) "{question_text}"')
+
+        # update the spreadsheet cell with the text
+        if question_number and 1 <= question_number <= 40 and question_text:
+            sheets.update_trivia_cell(ss_client, ss_id, question_number, question_text)
+        else:
+            logger.warning("Could not update spreadsheet.")
 
     logger.info(f"Found and processed {count} image file(s).")
     logger.info("...finished.")
