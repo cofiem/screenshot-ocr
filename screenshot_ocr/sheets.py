@@ -112,7 +112,7 @@ def update_spreadsheet_cell(
         )
     )
 
-    logger.info("Updating spreadsheet cell' %s'.", range_notation)
+    logger.info('Updating spreadsheet cell "%s".', range_notation)
 
     response = request.execute()
     if response.get("spreadsheetId") != ss_id or not all([i == 1 for i in []]):
