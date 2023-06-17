@@ -10,15 +10,15 @@ concurrency:
 
 jobs:
   analyze:
-    name: "Analyze ${{ matrix.os }} / ${{ matrix.python_version }}"
+    name: "Analyze ${{ matrix.os }} / ${{ matrix.python-version }}"
     runs-on: ${{ matrix.os }}-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [Ubuntu, Windows, macOS]
+        os: [ Ubuntu ]
         language: [ "python" ]
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+        python-version: [ "3.12" ]
 
     steps:
       - name: Checkout repository
