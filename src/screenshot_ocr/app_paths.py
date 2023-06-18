@@ -40,11 +40,8 @@ class DefaultPaths:
         Returns:
             The Downloads directory, if known.
         """
-        # result = self._platform_dirs.user_downloads_path
-        result = self._get_user_downloads_dir_win_guess()
-        if result:
-            return result
-        return self._get_user_downloads_dir_win_reg()
+        result = self._platform_dirs.user_downloads_path
+        return self._get_path("Downloads directory", "default user directories", result)
 
     @functools.cached_property
     def documents_dir(self) -> pathlib.Path | None:
@@ -274,49 +271,3 @@ class DefaultPaths:
             expected_path,
         )
         return expected_path
-
-    def _get_user_downloads_dir_win_guess(self) -> pathlib.Path | None:
-        if not self.is_win:
-            return None
-
-        user_profile = os.environ.get("USERPROFILE")
-        if not user_profile or not user_profile.strip():
-            return None
-
-        return self._get_path(
-            "Downloads directory",
-            "default user directories",
-            pathlib.Path(user_profile),
-            "Downloads",
-        )
-
-    def _get_user_downloads_dir_win_reg(self) -> pathlib.Path | None:
-        try:
-            import winreg
-
-            tree_root = winreg.HKEY_CURRENT_USER
-            tree_leaf = winreg.OpenKeyEx(
-                tree_root,
-                r"SOFTWARE\\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
-            )
-            key_value, key_type = winreg.QueryValueEx(
-                tree_leaf,
-                "{374DE290-123F-4565-9164-39C4925E467B}",
-            )
-            if tree_leaf:
-                winreg.CloseKey(tree_leaf)
-
-            if key_value and key_type == winreg.REG_SZ:
-                self._get_path(
-                    "Downloads directory",
-                    "default user directories",
-                    pathlib.Path(key_value),
-                    "Downloads",
-                )
-                return pathlib.Path(key_value)
-
-            return None
-        except ImportError:
-            pass
-
-        return None

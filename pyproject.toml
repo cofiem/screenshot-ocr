@@ -134,7 +134,7 @@ commands =
     -python -X dev -m pylint src
     echo "::endgroup::"
     echo "::group::Build"
-    python -m build --sdist --wheel --outdir dist/{env_name}/ .
+    python -m build --sdist --wheel --outdir build/dist-test/{env_name}/ .
     echo "::endgroup::"
 """
 

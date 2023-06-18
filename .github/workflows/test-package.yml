@@ -18,7 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 'Ubuntu' ] # , 'Windows', 'macOS'
+        # TODO: add tests for 'Windows' and 'macOS'. Need to install Tesseract.
+        os: [ 'Ubuntu' ]
         python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
 
     permissions:
@@ -41,6 +42,7 @@ jobs:
           echo "::group::Pip dependencies"
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install --upgrade -r requirements-dev.txt -r requirements.txt
+          sudo apt-get install tesseract-ocr
           echo "::endgroup::"
 
       - name: Run tox

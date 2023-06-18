@@ -27,6 +27,4 @@ types-backports
 types-urllib3
 
 # docs
-mkdocs
-mkdocstrings[python]
-mkdocs-material
+pdoc

@@ -8,7 +8,9 @@ from importlib_resources import files
 from screenshot_ocr import cli
 
 
-def test_example_app(capsys, caplog, equal_ignore_whitespace, collapse_whitespace):
+def test_tesseract_extract(
+    capsys, caplog, equal_ignore_whitespace, collapse_whitespace
+):
     # arrange
     spreadsheet_id = str(uuid.uuid4())
     input_dir = files("tests").joinpath("resources", "examples")
@@ -19,11 +21,11 @@ def test_example_app(capsys, caplog, equal_ignore_whitespace, collapse_whitespac
             .joinpath(
                 "resources",
                 "examples",
-                "Screenshot 2023-06-09 at 18-45-03 Facebook.txt",
+                "Screenshot 2023-06-16 at 18-49-13 Facebook.txt",
             )
             .read_text(),
         )
-        .replace("QUESTION 12", "")
+        .replace("QUESTION 17", "")
         .strip()
     )
 
@@ -73,7 +75,7 @@ def test_example_app(capsys, caplog, equal_ignore_whitespace, collapse_whitespac
         (
             "screenshot_ocr.app",
             20,
-            f'"Screenshot 2023-06-09 at 18-45-03 Facebook.png": Q12) "{expected_text}"',
+            f'"Screenshot 2023-06-16 at 18-49-13 Facebook.png": Q17) "{expected_text}"',
         ),
         ("screenshot_ocr.google_sheets", 20, "Starting authorisation flow."),
         (
