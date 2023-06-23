@@ -75,8 +75,11 @@ def test_app_paths_linux():
     local_app_data = pathlib.Path("~/.config")
     base_config_dir = local_app_data / author_name / app_name
 
-    assert google_credentials_file == base_config_dir / "credentials.json"
-    assert google_token_file == base_config_dir / "token.json"
+    assert (
+        google_credentials_file.absolute()
+        == (base_config_dir / "credentials.json").absolute()
+    )
+    assert google_token_file.absolute() == (base_config_dir / "token.json").absolute()
 
     # shared program install
     tesseract_exe_file = d.tesseract_exe_file
