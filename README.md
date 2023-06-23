@@ -27,7 +27,9 @@ There are three things to set up to get a working installation:
 1. Have a look at the [RealPython guide to install Python](https://realpython.com/installing-python)
 and check the version of Python that is installed.
 
-2. Create and activate a Python virtual environment (`venv`).
+2. Try using [pipx](https://pypa.github.io/pipx/installation/) to install `screenshort-ocr`.
+
+3. Create and activate a Python virtual environment (`venv`).
 The [Python Packaging Guide shows how to create a venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment).
 
 For example:
@@ -43,7 +45,7 @@ source screenshort-ocr-venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 ```
 
-3. Install this package (`screenshot-ocr`) from PyPI using pip.
+4. Install this package (`screenshot-ocr`) from PyPI using pip.
 
 For example:
 
@@ -52,7 +54,7 @@ For example:
 pip install screenshot-ocr
 ```
 
-4. Show the `screenshot-ocr` help and version to check it is installed.
+5. Show the `screenshot-ocr` help and version to check it is installed.
 
 For example:
 
