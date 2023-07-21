@@ -68,9 +68,9 @@ class TriviaHelper:
             True if the cell was successfully updated, otherwise False.
         """
         first_group_start = 1
-        # first_grop_end = 20
-        second_group_start = 21
-        second_group_end = 40
+        # first_grop_end = 15
+        second_group_start = 16
+        second_group_end = 30
 
         col = "B"
         first_group_row_offset = 2
