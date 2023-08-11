@@ -47,7 +47,11 @@ class TriviaHelper:
             line_lower = line.casefold()
 
             if line.strip() and number is None and key_question in line_lower:
-                number = int(line_lower.replace(key_question, "").strip())
+                maybe_number = line_lower.replace(key_question, "").strip()
+                if maybe_number in ["il", "i1", "l1", "li", "1i", "1l"]:
+                    number = 11
+                else:
+                    number = int(maybe_number)
                 continue
 
             if not line.strip():
