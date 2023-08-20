@@ -3,6 +3,7 @@ import pathlib
 import sys
 
 import pytest
+from helpers import normalise_path
 
 from screenshot_ocr import utils
 from screenshot_ocr.app_paths import DefaultPaths
@@ -35,11 +36,12 @@ def test_app_paths_windows():
     )
     base_config_dir = local_app_data / author_name / app_name
 
-    assert (
-        google_credentials_file.absolute()
-        == (base_config_dir / "credentials.json").absolute()
+    assert normalise_path(google_credentials_file) == normalise_path(
+        base_config_dir / "credentials.json",
     )
-    assert google_token_file.absolute() == (base_config_dir / "token.json").absolute()
+    assert normalise_path(google_token_file) == normalise_path(
+        base_config_dir / "token.json",
+    )
 
     # shared program install
     tesseract_exe_file = d.tesseract_exe_file
@@ -75,11 +77,12 @@ def test_app_paths_linux():
     local_app_data = pathlib.Path("~/.config")
     base_config_dir = local_app_data / author_name / app_name
 
-    assert (
-        google_credentials_file.absolute()
-        == (base_config_dir / "credentials.json").absolute()
+    assert normalise_path(google_credentials_file) == normalise_path(
+        base_config_dir / "credentials.json",
     )
-    assert google_token_file.absolute() == (base_config_dir / "token.json").absolute()
+    assert normalise_path(google_token_file) == normalise_path(
+        base_config_dir / "token.json"
+    )
 
     # shared program install
     tesseract_exe_file = d.tesseract_exe_file
