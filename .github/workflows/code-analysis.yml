@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ Ubuntu ]
         language: [ "python" ]
-        python-version: [ "3.12" ]
+        python-version: [ "3.11" ]
 
     permissions:
       actions: read
