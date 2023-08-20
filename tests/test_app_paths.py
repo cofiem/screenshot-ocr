@@ -59,7 +59,7 @@ def test_app_paths_windows():
 def test_app_paths_linux():
     d = DefaultPaths(allow_not_exist=True)
     app_name = utils.get_name_dash()
-    author_name = utils.get_author_dash()
+    utils.get_author_dash()
 
     user_profile = pathlib.Path.home()
 
@@ -75,13 +75,13 @@ def test_app_paths_linux():
     google_token_file = d.google_token_file
 
     local_app_data = pathlib.Path("~/.config")
-    base_config_dir = local_app_data / author_name / app_name
+    base_config_dir = local_app_data / app_name
 
     assert normalise_path(google_credentials_file) == normalise_path(
         base_config_dir / "credentials.json",
     )
     assert normalise_path(google_token_file) == normalise_path(
-        base_config_dir / "token.json"
+        base_config_dir / "token.json",
     )
 
     # shared program install
