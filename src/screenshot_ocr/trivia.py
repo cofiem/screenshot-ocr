@@ -48,7 +48,7 @@ class TriviaHelper:
 
             if line.strip() and number is None and key_question in line_lower:
                 maybe_number = line_lower.replace(key_question, "").strip()
-                if maybe_number in ["il", "i1", "l1", "li", "1i", "1l"]:
+                if maybe_number in ["il", "i1", "l1", "li", "1i", "1l", "ii"]:
                     number = 11
                 else:
                     number = int(maybe_number)
@@ -121,12 +121,11 @@ class TriviaHelper:
             if not file_path.stem.startswith("Screenshot "):
                 continue
 
-            stem_suffix_options = [
-                file_path.stem.endswith("Facebook"),
-                file_path.stem.endswith("Isolation Trivia"),
-            ]
-
-            if not any(stem_suffix_options):
+            # Screenshot 2023-10-13 at 18-45-57 Isolation Trivia Live Stream.png
+            # Screenshot 2023-10-06 at 18-37-23 Facebook.png
+            is_fb = "Facebook" in file_path.stem
+            is_iso_triv = "Isolation Trivia" in file_path.stem
+            if not is_fb and not is_iso_triv:
                 continue
 
             count += 1
