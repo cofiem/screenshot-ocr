@@ -24,6 +24,9 @@ There are three things to set up to get a working installation:
 
 ### Python and this package
 
+[![PyPI - Version](https://img.shields.io/pypi/v/screenshot-ocr)](https://pypi.org/project/screenshot-ocr)
+
+
 1. Have a look at the [RealPython guide to install Python](https://realpython.com/installing-python)
 and check the version of Python that is installed.
 
