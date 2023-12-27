@@ -89,7 +89,7 @@ python -m pip install --upgrade pip setuptools wheel
 # as the packages may not be on Test PyPI, or they might be different packages.
 python -m pip install --upgrade -r requirements.txt
 
-SCREENSHOT_OCR_VERSION='0.0.1'
+SCREENSHOT_OCR_VERSION='0.3.0'
 pip install --index-url https://test.pypi.org/simple/ --no-deps screenshot-ocr==$SCREENSHOT_OCR_VERSION
 # or
 pip install dist/screenshot_ocr-$SCREENSHOT_OCR_VERSION-py3-none-any.whl
