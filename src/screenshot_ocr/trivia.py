@@ -43,19 +43,32 @@ class TriviaHelper:
         key_question = "question"
         number = None
         text = ""
+
+        fixes = {
+            "i": "1",
+            "l": "1",
+            "o": "0",
+        }
+
         for line in value.splitlines():
-            line_lower = line.casefold()
-
-            if line.strip() and number is None and key_question in line_lower:
-                maybe_number = line_lower.replace(key_question, "").strip()
-                if maybe_number in ["il", "i1", "l1", "li", "1i", "1l", "ii"]:
-                    number = 11
-                else:
-                    number = int(maybe_number)
+            line_strip = line.strip()
+            if not line_strip:
                 continue
 
-            if not line.strip():
+            line_lower = line_strip.casefold()
+
+            if key_question in line_lower:
+                start_index = line_lower.index(key_question) + len(key_question)
+                raw = list(line_lower[start_index:].strip())
+
+                for index, char in enumerate(raw):
+                    if char in fixes:
+                        raw[index] = fixes[char]
+
+                number = int("".join(raw))
+
                 continue
+
             text += " " + line.strip()
 
         text = text.strip()
