@@ -9,7 +9,10 @@ from screenshot_ocr import cli
 
 
 def test_tesseract_extract(
-    capsys, caplog, equal_ignore_whitespace, collapse_whitespace
+    capsys,
+    caplog,
+    equal_ignore_whitespace,
+    collapse_whitespace,
 ):
     # arrange
     spreadsheet_id = str(uuid.uuid4())
@@ -75,7 +78,7 @@ def test_tesseract_extract(
         (
             "screenshot_ocr.app",
             20,
-            f'"Screenshot 2023-06-16 at 18-49-13 Facebook.png": Q17) "{expected_text}"',
+            f'"Screenshot 2023-06-16 at 18-49-13 Facebook.png": Q17) (1 points) "{expected_text}"',
         ),
         ("screenshot_ocr.google_sheets", 20, "Starting authorisation flow."),
         (

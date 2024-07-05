@@ -155,7 +155,7 @@ class GoogleSheetsHelper:
             )
         )
 
-        logger.info('Updating spreadsheet cell "%s".', range_notation)
+        logger.info('Updating spreadsheet cell "%s" to "%s".', range_notation, value)
 
         response = request.execute()
         if response.get("spreadsheetId") != ss_id:

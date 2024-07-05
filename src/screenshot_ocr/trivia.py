@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import typing
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
@@ -31,24 +32,35 @@ class TriviaHelper:
         self.ss_client = sheets_helper
         self.ss_id = spreadsheet_id
 
-    def get_number_and_question(self, value: str) -> tuple[int | None, str]:
-        """Parse the question number and question text.
+    def get_text_details(self, value: str) -> tuple[int | None, int | None, str]:
+        """Parse the question text to get the number, points, and question text.
 
         Args:
             value: The raw text from the screenshot.
 
         Returns:
-            A tuple containing the question number and text.
+            A tuple containing the question number, points, and text.
         """
-        key_question = "question"
+        # output
         number = None
+        points = 1
         text = ""
 
+        # initial
         fixes = {
             "i": "1",
             "l": "1",
             "o": "0",
         }
+        num_map = {
+            "one": 1,
+            "two": 2,
+            "three": 3,
+            "four": 4,
+            "five": 5,
+        }
+        key_question = "question"
+        re_points = re.compile(r"(?P<num>(one|two|three|four|five))\s+points?")
 
         for line in value.splitlines():
             line_strip = line.strip()
@@ -57,7 +69,7 @@ class TriviaHelper:
 
             line_lower = line_strip.casefold()
 
-            if key_question in line_lower:
+            if key_question in line_lower and not number:
                 start_index = line_lower.index(key_question) + len(key_question)
                 raw = list(line_lower[start_index:].strip())
 
@@ -65,20 +77,27 @@ class TriviaHelper:
                     if char in fixes:
                         raw[index] = fixes[char]
 
-                number = int("".join(raw))
+                number_raw = "".join(raw)
+                if all(c.isdigit() for c in number_raw):
+                    number = int(number_raw)
+                    continue
 
-                continue
+            match = re_points.search(line_lower)
+            if match and points == 1:
+                num_word = match.group("num")
+                points = num_map[num_word]
 
             text += " " + line.strip()
 
         text = text.strip()
-        return number, text
+        return number, points, text
 
-    def update_trivia_cell(self, number: int, text: str) -> bool:
+    def update_trivia_cell(self, number: int, points: int, text: str) -> bool:
         """Update the Google Docs spreadsheet cell for the question number and text.
 
         Args:
             number: The question number.
+            points: The points for the question.
             text: The question text.
 
         Returns:
@@ -89,7 +108,8 @@ class TriviaHelper:
         second_group_start = 16
         second_group_end = 30
 
-        col = "B"
+        col_text = "B"
+        col_points = "D"
         first_group_row_offset = 2
         second_group_row_offset = 5
 
@@ -102,13 +122,21 @@ class TriviaHelper:
             if number < second_group_start
             else str(number + second_group_row_offset)
         )
-        return self.ss_client.update_spreadsheet_cell(
+        result_text = self.ss_client.update_spreadsheet_cell(
             self.ss_id,
             sheet_name,
-            col,
+            col_text,
             row,
             text,
         )
+        result_points = self.ss_client.update_spreadsheet_cell(
+            self.ss_id,
+            sheet_name,
+            col_points,
+            row,
+            str(points),
+        )
+        return result_text and result_points
 
     def find_screenshot_images(
         self,

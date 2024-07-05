@@ -91,16 +91,21 @@ class App:
                 count += 1
 
                 # extract the question number
-                question_number, question_text = trivia_helper.get_number_and_question(
+                (
+                    question_number,
+                    question_points,
+                    question_text,
+                ) = trivia_helper.get_text_details(
                     output_text,
                 )
 
                 # print the image file name and extracted question number
                 # and text to stdout
                 logger.info(
-                    '"%s": Q%s) "%s"',
+                    '"%s": Q%s) (%s points) "%s"',
                     image_file.name,
                     question_number,
+                    question_points,
                     question_text,
                 )
 
@@ -109,6 +114,7 @@ class App:
                 if question_number:
                     update_result = trivia_helper.update_trivia_cell(
                         question_number,
+                        question_points,
                         question_text,
                     )
 
