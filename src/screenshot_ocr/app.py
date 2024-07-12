@@ -78,7 +78,9 @@ class App:
             count = 0
 
             # find the image files and extract the text from each
-            for image_file in trivia_helper.find_screenshot_images(input_dir):
+            for image_file, found_date in trivia_helper.find_screenshot_images(
+                input_dir
+            ):
                 output_text = ocr_helper.run(image_file) or ""
                 if move_images:
                     # move the image file to the output dir
@@ -116,6 +118,7 @@ class App:
                         question_number,
                         question_points,
                         question_text,
+                        sheet_date=found_date,
                     )
 
                 if not update_result:

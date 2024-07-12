@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from screenshot_ocr.trivia import TriviaHelper
@@ -63,3 +65,29 @@ def test_trivia_get_number_and_question(
     assert actual_question == expected_question
     assert actual_points == expected_points
     assert actual_text == expected_text.replace("\n\n", "\n").replace("\n", " ").strip()
+
+
+@pytest.mark.parametrize(
+    ("file_name", "expected_date"),
+    [
+        (
+            "Screenshot 2023-10-13 at 18-45-57 Isolation Trivia Live Stream.png",
+            datetime.datetime(2023, 10, 13),
+        ),
+        (
+            "Screenshot 2023-10-06 at 18-37-23 Facebook.png",
+            datetime.datetime(2023, 10, 6),
+        ),
+        ("Screenshot no date here Facebook.png", None),
+        ("Screenshot 2023-10-06 at 18-37-23 wrong website name.png", None),
+    ],
+)
+def test_find_screenshot_images(tmp_path, file_name, expected_date):
+    file_path = tmp_path / file_name
+    file_path.touch()
+
+    helper = TriviaHelper(None, None)
+    for found_path, date in helper.find_screenshot_images(tmp_path):
+        if expected_date is not None:
+            assert found_path.name == file_name
+            assert date == expected_date

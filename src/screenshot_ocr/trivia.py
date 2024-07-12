@@ -92,7 +92,9 @@ class TriviaHelper:
         text = text.strip()
         return number, points, text
 
-    def update_trivia_cell(self, number: int, points: int, text: str) -> bool:
+    def update_trivia_cell(
+        self, number: int, points: int, text: str, sheet_date: datetime | None = None
+    ) -> bool:
         """Update the Google Docs spreadsheet cell for the question number and text.
 
         Args:
@@ -115,7 +117,11 @@ class TriviaHelper:
 
         if not number or first_group_start > number >= second_group_end or not text:
             return False
-        sheet_name = datetime.now(timezone.utc).strftime("%Y-%m-%d %a")
+
+        if not sheet_date:
+            sheet_date = datetime.now(timezone.utc)
+
+        sheet_name = sheet_date.strftime("%Y-%m-%d %a")
 
         row = (
             str(number + first_group_row_offset)
@@ -148,9 +154,10 @@ class TriviaHelper:
             image_dir: The directory containing image files.
 
         Returns:
-            An iterable of image file paths.
+            An iterable of tuple image file path and date extracted from file name.
         """
         suffixes = [i.casefold() for i in [".png", ".jpeg", ".jpg"]]
+        date_re = re.compile(r"(?P<date>\d{4}-\d{2}-\d{2})")
 
         logger.info("Looking for screenshot images in '%s'.", image_dir)
         count = 0
@@ -162,14 +169,19 @@ class TriviaHelper:
             if not file_path.stem.startswith("Screenshot "):
                 continue
 
-            # Screenshot 2023-10-13 at 18-45-57 Isolation Trivia Live Stream.png
-            # Screenshot 2023-10-06 at 18-37-23 Facebook.png
             is_fb = "Facebook" in file_path.stem
             is_iso_triv = "Isolation Trivia" in file_path.stem
             if not is_fb and not is_iso_triv:
                 continue
 
+            # extract the date from the screenshot file name
+            date_match = date_re.search(file_path.stem)
+            if date_match:
+                found_date = datetime.fromisoformat(date_match.group("date"))
+            else:
+                found_date = None
+
             count += 1
-            yield file_path
+            yield file_path, found_date
 
         logger.info("Found %s screenshot images.", count)
