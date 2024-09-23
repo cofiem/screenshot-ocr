@@ -4,7 +4,7 @@ google-auth-httplib2~=0.2.0
 google-auth-oauthlib~=1.2.1
 
 # files
-platformdirs~=4.3.3
+platformdirs~=4.3.6
 
 # compatibility
 importlib_resources>=5
