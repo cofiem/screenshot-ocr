@@ -25,18 +25,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - uses: hynek/build-and-inspect-python-package@v2
-        id: buildinspect
+        id: baipp
 
     outputs:
       # Used to define the matrix for tests below. The value is based on
       # packaging metadata (trove classifiers).
-      python-versions: ${{ steps.buildinspect.outputs.supported_python_classifiers_json_array }}
+      python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
 
   tests:
     name: Test on ${{ matrix.os }} using Python ${{ matrix.python-version }}
@@ -105,7 +106,8 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
@@ -122,18 +124,22 @@ jobs:
 
       - name: Combine coverage and fail if under expected percentage
         run: |
+          # Install coverage packages
           pip install coverage
 
+          # Combine the coverage from each Python version
           coverage combine
+          
+          # Generate the html coverage report
           coverage html --skip-covered --skip-empty
 
-          # Report and write to summary.
+          # Generate the markdown coverage report to the GitHub step summary
           coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
-          # Report again and fail if under expected percentage.
+          # Generate the coverage report and fail if under expected percentage
           coverage report --fail-under=65
 
-      - name: Upload HTML report if check failed.
+      - name: Upload HTML report if coverage under expected percentage
         uses: actions/upload-artifact@v4
         with:
           name: html-report

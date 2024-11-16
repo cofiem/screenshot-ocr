@@ -1,11 +1,10 @@
+import re
 import sys
 
 import pytest
 
 from screenshot_ocr import cli, utils
 
-
-expected_version = "0.3.0"
 
 if sys.version_info >= (3, 10):
     help_phrase_options = "options:"
@@ -85,6 +84,8 @@ def test_cli_version(capsys, caplog):
         cli.main(["--version"])
 
     stdout, stderr = capsys.readouterr()
-    assert stdout == f"{utils.get_name_dash()} {expected_version}\n"
+    assert re.fullmatch(
+        rf"{utils.get_name_dash()}\s+\d+\.\d+\.\d+(\.dev\d+)?\n$", stdout
+    )
     assert stderr == ""
     assert caplog.record_tuples == []

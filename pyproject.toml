@@ -99,61 +99,51 @@ env_list = [
 [tool.tox.env_run_base]
 package = "wheel"
 wheel_build_env = ".pkg"
+extras = ["dev"]
 
 [tool.tox.env.py39-tests]
-extras = ["dev"]
 commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 [tool.tox.env.py310-tests]
-extras = ["dev"]
 commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 [tool.tox.env.py311-tests]
-extras = ["dev"]
 commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 [tool.tox.env.py312-tests]
-extras = ["dev"]
 commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 [tool.tox.env.py313-tests]
-extras = ["dev"]
 commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 
 [tool.tox.env.py39-mypy]
-extras = ["dev"]
 commands = [
     ["mypy", "src"],
 ]
 [tool.tox.env.py310-mypy]
-extras = ["dev"]
 commands = [
     ["mypy", "src"],
 ]
 [tool.tox.env.py311-mypy]
-extras = ["dev"]
 commands = [
     ["mypy", "src"],
 ]
 [tool.tox.env.py312-mypy]
-extras = ["dev"]
 commands = [
     ["mypy", "src"],
 ]
 [tool.tox.env.py313-mypy]
-extras = ["dev"]
 commands = [
     ["mypy", "src"],
 ]
 
 [tool.tox.env.coverage-report]
-extras = ['dev']
 parallel_show_output = true
 commands = [
     ["coverage", "combine"],
@@ -161,14 +151,12 @@ commands = [
 ]
 
 [tool.tox.env.lint-style]
-extras = ["dev"]
 commands = [
     ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
     ["ruff", "format", "--check", "--diff", "src", "tests"],
 ]
 
 [tool.tox.env.lint-docs]
-extras = ["dev"]
 commands = [
     ["interrogate", "-vv", "--fail-under", "75", "src"],
     ["codespell", "--quiet-level", "0", "--summary", "--check-filenames", "--write-changes", "--skip", "*.pyc,*.png", "src", "tests"]
