@@ -48,7 +48,6 @@ where = ["src"]
 include = ["screenshot_ocr*"]
 
 [tool.setuptools.dynamic]
-version = { file = ["VERSION"] }
 dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools.dynamic.optional-dependencies]
