@@ -5,6 +5,7 @@ wheel
 build
 twine
 pip-audit
+setuptools-git-versioning>=2.0,<3
 
 # tests
 pytest
