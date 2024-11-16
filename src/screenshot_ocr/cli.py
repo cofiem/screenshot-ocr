@@ -1,4 +1,5 @@
 """Command line for screenshot ocr."""
+
 from __future__ import annotations
 
 import argparse
@@ -30,7 +31,6 @@ def main(args: list[str] | None = None) -> int:
         format="%(asctime)s [%(levelname)-8s] %(message)s",
         level=overall_log_level,
     )
-    logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser(
         prog="screenshot-ocr",
@@ -107,11 +107,12 @@ def main(args: list[str] | None = None) -> int:
         return 1
 
     except utils.ScreenshotOcrError as error:
-        logger.exception("Error: %s - %s", error.__class__.__name__, str(error))
+        utils.log_exception(error)
         return 1
 
-    except Exception as error:  # pylint: disable=broad-except
-        logger.exception("Error: %s - %s", error.__class__.__name__, str(error))
+    except Exception as error:  # noqa: BLE001
+        # Catch broad exception to log error.
+        utils.log_exception(error)
         return 2
 
 

@@ -4,6 +4,7 @@ import pytest
 
 from screenshot_ocr.trivia import TriviaHelper
 
+
 example_1_longer_question = "QUESTION 15"
 example_1_longer_text = """
 Last month we did a Family Feud-style survey on the Isolation
@@ -72,11 +73,11 @@ def test_trivia_get_number_and_question(
     [
         (
             "Screenshot 2023-10-13 at 18-45-57 Isolation Trivia Live Stream.png",
-            datetime.datetime(2023, 10, 13),
+            datetime.datetime(2023, 10, 13, tzinfo=datetime.timezone.utc),
         ),
         (
             "Screenshot 2023-10-06 at 18-37-23 Facebook.png",
-            datetime.datetime(2023, 10, 6),
+            datetime.datetime(2023, 10, 6, tzinfo=datetime.timezone.utc),
         ),
         ("Screenshot no date here Facebook.png", None),
         ("Screenshot 2023-10-06 at 18-37-23 wrong website name.png", None),

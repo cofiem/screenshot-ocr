@@ -11,15 +11,16 @@ pytest
 pytest-mock
 pytest-cov
 tox
-coverage
+coverage[toml]
 
 # linters
 black
 ruff
+codespell
+interrogate
 
 # type checking
 mypy
-pylint
 types-dateparser
 types-PyYAML
 types-requests

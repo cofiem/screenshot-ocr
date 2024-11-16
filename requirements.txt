@@ -9,3 +9,4 @@ platformdirs~=4.3.6
 # compatibility
 importlib_resources>=5
 importlib_metadata>=6
+typing-extensions>=4

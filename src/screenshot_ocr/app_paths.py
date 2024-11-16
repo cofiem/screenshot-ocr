@@ -1,4 +1,5 @@
 """Provides default and calculated paths to required directories and files."""
+
 from __future__ import annotations
 
 import functools
@@ -12,6 +13,7 @@ import platformdirs
 
 from screenshot_ocr import utils
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +22,7 @@ class DefaultPaths:
 
     is_win = sys.platform.startswith("win")
 
-    def __init__(self, allow_not_exist: bool = False) -> None:
+    def __init__(self, *, allow_not_exist: bool = False) -> None:
         """Create a new instance.
 
         Args:

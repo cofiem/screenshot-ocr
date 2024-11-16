@@ -73,16 +73,17 @@ def test_tesseract_extract(
         (
             "screenshot_ocr.trivia",
             20,
-            "Looking for screenshot images in " f"'{input_dir}'.",
+            f"Looking for screenshot images in '{input_dir}'.",
         ),
         (
             "screenshot_ocr.app",
             20,
-            f'"Screenshot 2023-06-16 at 18-49-13 Facebook.png": Q17) (1 points) "{expected_text}"',
+            '"Screenshot 2023-06-16 at 18-49-13 Facebook.png": Q17) (1 points) '
+            f'"{expected_text}"',
         ),
         ("screenshot_ocr.google_sheets", 20, "Starting authorisation flow."),
         (
-            "screenshot_ocr.app",
+            "screenshot_ocr.utils",
             40,
             "Error: ValueError - Client secrets must be for a web or installed app.",
         ),

@@ -1,12 +1,17 @@
 """Main application."""
+
 from __future__ import annotations
 
 import dataclasses
 import logging
 import shutil
-from typing import TYPE_CHECKING
 
-from screenshot_ocr import app_paths, google_sheets, ocr, trivia
+from typing import TYPE_CHECKING, TypedDict
+
+from typing_extensions import Unpack
+
+from screenshot_ocr import app_paths, google_sheets, ocr, trivia, utils
+
 
 if TYPE_CHECKING:
     import pathlib
@@ -79,7 +84,7 @@ class App:
 
             # find the image files and extract the text from each
             for image_file, found_date in trivia_helper.find_screenshot_images(
-                input_dir
+                input_dir,
             ):
                 output_text = ocr_helper.run(image_file) or ""
                 if move_images:
@@ -100,6 +105,9 @@ class App:
                 ) = trivia_helper.get_text_details(
                     output_text,
                 )
+
+                if not question_points:
+                    question_points = 1
 
                 # print the image file name and extracted question number
                 # and text to stdout
@@ -127,12 +135,27 @@ class App:
             logger.info("Finished. Found and processed %s image file(s).", count)
             return True
 
-        except Exception as error:
-            logger.exception("Error: %s - %s", error.__class__.__name__, str(error))
+        except Exception as error:  # noqa: BLE001
+            # Catch broad exception to log error.
+            utils.log_exception(error)
             return False
 
 
-def build_app_args_with_defaults_from_args(**kwargs) -> AppArgs:
+class BuildAppArgs(TypedDict):
+    """Type for build app args."""
+
+    spreadsheet_id: str
+    input_dir: pathlib.Path | None
+    output_dir: pathlib.Path | None
+    tesseract_exe: pathlib.Path | None
+    tesseract_data: pathlib.Path | None
+    google_credentials: pathlib.Path | None
+    google_token: pathlib.Path | None
+    move_images: bool | None
+    no_move_images: bool | None
+
+
+def build_app_args_with_defaults_from_args(**kwargs: Unpack[BuildAppArgs]) -> AppArgs:
     """Build app arguments, using defaults for any that are missing.
 
     Args:
@@ -160,6 +183,28 @@ def build_app_args_with_defaults_from_args(**kwargs) -> AppArgs:
     logger.info("Using Tesseract data: '%s'.", tesseract_data)
     logger.info("Using Google credentials: '%s'.", google_credentials)
     logger.info("Using Google token: '%s'.", google_token)
+
+    if not spreadsheet_id:
+        msg = "Invalid spreadsheet_id."
+        raise ValueError(msg)
+    if not input_dir:
+        msg = "Invalid input_dir."
+        raise ValueError(msg)
+    if not output_dir:
+        msg = "Invalid output_dir."
+        raise ValueError(msg)
+    if not tesseract_exe:
+        msg = "Invalid tesseract_exe."
+        raise ValueError(msg)
+    if not tesseract_data:
+        msg = "Invalid tesseract_data."
+        raise ValueError(msg)
+    if not google_credentials:
+        msg = "Invalid google_credentials."
+        raise ValueError(msg)
+    if not google_token:
+        msg = "Invalid google_token."
+        raise ValueError(msg)
 
     result = AppArgs(
         spreadsheet_id=spreadsheet_id,

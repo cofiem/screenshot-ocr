@@ -1,9 +1,11 @@
 """Optical Character Recognition using Tesseract."""
+
 from __future__ import annotations
 
 import logging
 import subprocess
 import typing
+
 
 if typing.TYPE_CHECKING:
     import pathlib
@@ -40,7 +42,7 @@ class OcrHelper:
             str(image_file),
             "stdout",
         ]
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             cmds,
             check=True,
             capture_output=True,

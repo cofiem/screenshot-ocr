@@ -4,9 +4,10 @@ import pytest
 
 from screenshot_ocr import cli, utils
 
+
 expected_version = "0.3.0"
 
-if sys.version_info.minor >= 10:
+if sys.version_info >= (3, 10):
     help_phrase_options = "options:"
 else:
     help_phrase_options = "optional arguments:"

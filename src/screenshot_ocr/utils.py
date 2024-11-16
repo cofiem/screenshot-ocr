@@ -1,10 +1,12 @@
 """Small utility functions."""
+
 from __future__ import annotations
 
 import logging
 
 from importlib_metadata import PackageNotFoundError, distribution
 from importlib_resources import as_file, files
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +41,8 @@ def get_version() -> str | None:
 
     try:
         with as_file(files(get_name_under()).joinpath("cli.py")) as file_path:
-            return (file_path.parent.parent.parent / "VERSION").read_text().strip()
+            version_text = (file_path.parent.parent.parent / "VERSION").read_text()
+            return str(version_text.strip())
     except FileNotFoundError:
         pass
 
@@ -48,3 +51,12 @@ def get_version() -> str | None:
 
 class ScreenshotOcrError(Exception):
     """A custom error for screenshot ocr."""
+
+
+def log_exception(error: Exception) -> None:
+    """Log an exception."""
+    logger.exception(
+        "Error: %s - %s",
+        error.__class__.__name__,
+        str(error),
+    )

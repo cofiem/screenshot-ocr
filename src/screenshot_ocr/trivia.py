@@ -1,11 +1,14 @@
 """Features for processing screenshots and spreadsheet for online trivia."""
+
 from __future__ import annotations
 
 import logging
 import re
 import typing
+
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
+
 
 if TYPE_CHECKING:
     import pathlib
@@ -93,7 +96,11 @@ class TriviaHelper:
         return number, points, text
 
     def update_trivia_cell(
-        self, number: int, points: int, text: str, sheet_date: datetime | None = None
+        self,
+        number: int,
+        points: int,
+        text: str,
+        sheet_date: datetime | None = None,
     ) -> bool:
         """Update the Google Docs spreadsheet cell for the question number and text.
 
@@ -101,12 +108,13 @@ class TriviaHelper:
             number: The question number.
             points: The points for the question.
             text: The question text.
+            sheet_date: The date to use to find the sheet.
 
         Returns:
             True if the cell was successfully updated, otherwise False.
         """
         first_group_start = 1
-        # first_grop_end = 15
+        # first_group_end = 15
         second_group_start = 16
         second_group_end = 30
 
@@ -135,19 +143,22 @@ class TriviaHelper:
             row,
             text,
         )
-        result_points = self.ss_client.update_spreadsheet_cell(
-            self.ss_id,
-            sheet_name,
-            col_points,
-            row,
-            str(points),
-        )
-        return result_text and result_points
+        result_points = None
+        if points is not None:
+            result_points = self.ss_client.update_spreadsheet_cell(
+                self.ss_id,
+                sheet_name,
+                col_points,
+                row,
+                str(points),
+            )
+
+        return result_text and (result_points if points is not None else True)
 
     def find_screenshot_images(
         self,
         image_dir: pathlib.Path,
-    ) -> typing.Iterable[pathlib.Path]:
+    ) -> typing.Iterable[tuple[pathlib.Path, datetime | None]]:
         """Yield the FireFox screenshot files.
 
         Args:
@@ -177,7 +188,9 @@ class TriviaHelper:
             # extract the date from the screenshot file name
             date_match = date_re.search(file_path.stem)
             if date_match:
-                found_date = datetime.fromisoformat(date_match.group("date"))
+                found_date = datetime.fromisoformat(date_match.group("date")).replace(
+                    tzinfo=timezone.utc,
+                )
             else:
                 found_date = None
 

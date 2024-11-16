@@ -1,13 +1,16 @@
 """Google Sheets helpers."""
+
 from __future__ import annotations
 
 import logging
+
 from typing import TYPE_CHECKING
 
 from google.auth.transport import requests
 from google.oauth2 import credentials
 from google_auth_oauthlib import flow
 from googleapiclient import discovery, errors
+
 
 if TYPE_CHECKING:
     import pathlib
@@ -54,14 +57,14 @@ class GoogleSheetsHelper:
 
     def _authorise(self) -> credentials.Credentials | None:
         """Authorise access to the Google Sheets API."""
-        creds = None
+        creds: credentials.Credentials | None = None
 
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
         if self._auth_token_file.exists():
             logger.info("Using credentials from token.json file.")
-            creds = credentials.Credentials.from_authorized_user_file(
+            creds = credentials.Credentials.from_authorized_user_file(  # type: ignore[no-untyped-call]
                 str(self._auth_token_file),
                 self._scopes,
             )
@@ -70,7 +73,8 @@ class GoogleSheetsHelper:
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 logger.info("Requesting new credentials.")
-                creds.refresh(requests.Request())
+                requests_req = requests.Request()  # type: ignore[no-untyped-call]
+                creds.refresh(requests_req)
             else:
                 logger.info("Starting authorisation flow.")
                 flow_result = flow.InstalledAppFlow.from_client_secrets_file(
@@ -80,8 +84,10 @@ class GoogleSheetsHelper:
                 creds = flow_result.run_local_server(port=0)
 
             # Save the credentials for the next run
-            logger.info("Saving credentials to token.json file.")
-            self._auth_token_file.write_text(creds.to_json())
+            if creds:
+                logger.info("Saving credentials to token.json file.")
+                creds_json = creds.to_json()  # type: ignore[no-untyped-call]
+                self._auth_token_file.write_text(creds_json)
 
         return creds
 
@@ -104,7 +110,11 @@ class GoogleSheetsHelper:
 
             logger.info("Created new client.")
         except errors.HttpError as error:
-            logger.exception("Error: %s - %s", error.__class__.__name__, str(error))
+            logger.exception(
+                "Error: %s - %s",
+                error.__class__.__name__,
+                str(error),  # noqa:TRY401
+            )
 
         return self._client
 
@@ -131,6 +141,11 @@ class GoogleSheetsHelper:
         Returns:
             True if the update succeeded, otherwise false.
         """
+        client = self.client()
+        if not client:
+            msg = "Client is not configured."
+            raise ValueError(msg)
+
         # https://developers.google.com/resources/api-libraries/documentation/sheets/v4/python/latest/sheets_v4.spreadsheets.html
         # https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update
         value_input_option = "USER_ENTERED"
@@ -143,8 +158,7 @@ class GoogleSheetsHelper:
         }
         # TODO: consider using WrapStrategy WRAP?
         request = (
-            self.client()
-            .spreadsheets()
+            client.spreadsheets()
             .values()
             .update(
                 spreadsheetId=ss_id,

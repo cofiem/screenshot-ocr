@@ -2,12 +2,13 @@ import re
 
 import pytest
 
+
 pytest.register_assert_rewrite("helpers")
 
 
-@pytest.fixture()
+@pytest.fixture
 def equal_ignore_whitespace():
-    def _equal_ignore_whitespace(value1: str, value2: str, ignore_case=False):
+    def _equal_ignore_whitespace(value1: str, value2: str, *, ignore_case=False):
         # Ignore non-space and non-word characters
         whitespace = re.compile(r"\s+")
         replace1 = whitespace.sub(" ", value1 or "").strip()
@@ -21,7 +22,7 @@ def equal_ignore_whitespace():
     return _equal_ignore_whitespace
 
 
-@pytest.fixture()
+@pytest.fixture
 def collapse_whitespace():
     def _collapse_whitespace(value: str):
         # Ignore non-space and non-word characters
