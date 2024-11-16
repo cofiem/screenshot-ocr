@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -32,14 +34,14 @@ jobs:
           python-version: '3.13'
 
       - name: Install dependencies
-        run: |
+        run: >
           pip install -U
           -e .
           -r requirements.txt
           -r requirements-dev.txt
 
       - name: Generate docs
-        run: |
+        run: >
           pdoc
           --docformat google
           --edit-url screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/
