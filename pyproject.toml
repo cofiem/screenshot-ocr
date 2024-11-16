@@ -90,7 +90,7 @@ lines-after-imports = 2
 [tool.tox]
 requires = ["tox>=4.19"]
 env_list = [
-    "py3{9,10,11,12,13}-{tests,mypy}",
+    "py3{9,10,11,12,13}-tests",
     "coverage-report",
     "lint-style",
     "lint-docs",
@@ -122,27 +122,6 @@ commands = [
     ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
 ]
 
-[tool.tox.env.py39-mypy]
-commands = [
-    ["mypy", "src"],
-]
-[tool.tox.env.py310-mypy]
-commands = [
-    ["mypy", "src"],
-]
-[tool.tox.env.py311-mypy]
-commands = [
-    ["mypy", "src"],
-]
-[tool.tox.env.py312-mypy]
-commands = [
-    ["mypy", "src"],
-]
-[tool.tox.env.py313-mypy]
-commands = [
-    ["mypy", "src"],
-]
-
 [tool.tox.env.coverage-report]
 parallel_show_output = true
 commands = [
@@ -154,13 +133,13 @@ commands = [
 commands = [
     ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
     ["ruff", "format", "--check", "--diff", "src", "tests"],
+    ["mypy", "src"],
 ]
 
 [tool.tox.env.lint-docs]
 commands = [
     ["interrogate", "-vv", "--fail-under", "75", "src"],
     ["codespell", "--quiet-level", "0", "--summary", "--check-filenames", "--write-changes", "--skip", "*.pyc,*.png", "src", "tests"]
-#    ["codespell", "--help"]
 ]
 
 [tool.mypy]
@@ -170,10 +149,6 @@ ignore_missing_imports = true
 check_untyped_defs = true
 no_implicit_optional = true
 show_error_codes = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
 
 [tool.ruff]
 line-length = 88
