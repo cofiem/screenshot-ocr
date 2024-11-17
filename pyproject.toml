@@ -94,6 +94,7 @@ env_list = [
     "coverage-report",
     "py3{9,13}-lint-style",
     "lint-docs",
+    "docs",
 ]
 
 [tool.tox.env_run_base]
@@ -147,6 +148,16 @@ commands = [
     ["interrogate", "-vv", "--fail-under", "90", "src"],
     ["codespell", "--quiet-level", "0", "--summary", "--check-filenames", "--write-changes", "--skip", "*.pyc,*.png", "src", "tests"]
 ]
+
+[tool.tox.env.docs]
+commands = [
+    ["pdoc",
+        "--docformat", "google",
+        "--edit-url", "screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/",
+        "--search", "--show-source", "--output-directory", "docs", "./src/screenshot_ocr"
+    ]
+]
+
 
 [tool.mypy]
 strict = true

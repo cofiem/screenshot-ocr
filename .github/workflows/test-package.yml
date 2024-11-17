@@ -159,6 +159,9 @@ jobs:
         # - windows
         python-version: ["3.13", "3.9"]
 
+    env:
+      PYTHON: ${{ matrix.python-version }}
+
     steps:
       - name: Download pre-built packages
         uses: actions/download-artifact@v4
@@ -181,4 +184,4 @@ jobs:
 
       - name: Lint docs
         if: matrix.python-version == '3.13'
-        run: pipx run tox run --installpkg dist/*.whl -f lint-docs
+        run: pipx run tox run --installpkg dist/*.whl -e lint-docs

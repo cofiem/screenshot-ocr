@@ -41,14 +41,7 @@ jobs:
           -r requirements-dev.txt
 
       - name: Generate docs
-        run: >
-          pdoc
-          --docformat google
-          --edit-url screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/
-          --search
-          --show-source
-          --output-directory docs
-          ./src/screenshot_ocr
+        run: pipx run tox run -e docs
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3

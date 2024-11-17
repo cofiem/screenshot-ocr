@@ -8,7 +8,6 @@ Release 2024-11-17.
 - Add GitHub Actions for checking coverage, Actions security, test coverage, linters.
 - Lots of minor code updates to satisfy linters.
 - Deploy docs via GitHub Actions.
--
 
 ## [v0.3.0](https://github.com/cofiem/screenshot-ocr/releases/tag/v0.3.0)
 

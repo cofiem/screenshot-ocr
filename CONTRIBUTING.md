@@ -18,24 +18,17 @@ Install runtime dependencies and development dependencies:
 source .venv/bin/activate
 
 # install dependencies
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install --upgrade -r requirements-dev.txt -r requirements.txt
-
-# check for outdated packages
-pip list --outdated
+python -m pip install --upgrade pip tox build
 ```
 
 ## Run tests and linters
 
 Run the tests and linters with multiple python versions using tox.
 
-If the pip dependencies have changed, it might be necessary to 
-(un)comment `recreate = true` in the tox section in `pyproject.toml`.
-
 To run using all available python versions:
 
 ```bash
-python -X dev -m tox
+python -X dev -m tox run -e ALL
 ```
 
 To run using the active python:
@@ -44,19 +37,7 @@ To run using the active python:
 python -X dev -m tox -e py
 ```
 
-## Generate docs
-
-Generate the docs:
-
-```bash
-pdoc --docformat google \
-  --edit-url screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/ \
-  --search --show-source \
-  --output-directory docs \
-  ./src/screenshot_ocr
-```
-
-## Create and upload release
+## Test a release locally
 
 Generate the distribution package archives.
 
@@ -64,34 +45,15 @@ Generate the distribution package archives.
 python -X dev -m build
 ```
 
-Upload archives to Test PyPI first.
-
-```bash
-python -X dev -m twine upload --repository testpypi dist/*
-```
-
-When uploading:
-
-- for username, use `__token__`
-- for password, [create a token](https://test.pypi.org/manage/account/#api-tokens)
-
-Go to the [test project page](https://test.pypi.org/project/screenshot-ocr) and check that it looks ok.
-
-Then create a new virtual environment, install the dependencies, and install from Test PyPI.
+Then create a new virtual environment, install the dependencies, and install from the local wheelTest PyPI.
 
 ```bash
 rm -rf .venv-test
 python -m venv .venv-test
 source .venv-test/bin/activate
-python -m pip install --upgrade pip setuptools wheel
 
-# use the requirements file to install dependencies from the production PyPI,
-# as the packages may not be on Test PyPI, or they might be different packages.
-python -m pip install --upgrade -r requirements.txt
+python -m pip install --upgrade pip
 
-SCREENSHOT_OCR_VERSION='0.3.0'
-pip install --index-url https://test.pypi.org/simple/ --no-deps screenshot-ocr==$SCREENSHOT_OCR_VERSION
-# or
 pip install dist/screenshot_ocr-$SCREENSHOT_OCR_VERSION-py3-none-any.whl
 ```
 
@@ -130,16 +92,33 @@ Traceback (most recent call last):
 ValueError: Client secrets must be for a web or installed app.
 ```
 
-If the package seems to work as expected, upload it to the live PyPI.
+## Test a release from Test PyPI
+
+If the package seems to work as expected, push changes to the `main` branch.
+
+Push changes to the `main` branch.
+The `pypi-package.yml` GitHub Actions workflow will deploy a release to Test PyPI.
+
+Then follow the same process as testing a release locally, except install from Test PyPI.
 
 ```bash
-python -X dev -m twine upload dist/*
+rm -rf .venv-test
+python -m venv .venv-test
+source .venv-test/bin/activate
+
+python -m pip install --upgrade pip
+
+# use the requirements file to install dependencies from the production PyPI,
+# as the packages may not be on Test PyPI, or they might be different (potentially malicious!) packages.
+python -m pip install --upgrade -r requirements.txt
+
+pip install --index-url https://test.pypi.org/simple/ --no-deps screenshot-ocr==$SCREENSHOT_OCR_VERSION
 ```
 
-When uploading:
+## Create a release to PyPI
 
-- for username, use `__token__`
-- for password, [create a token](https://pypi.org/manage/account/#api-tokens)
+Create a tag on the `main` branch.
+The `pypi-package.yml` GitHub Actions workflow will deploy a release to PyPI.
 
 Go to the [live project page](https://pypi.org/project/screenshot-ocr) and check that it looks ok.
 
