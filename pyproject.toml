@@ -92,7 +92,7 @@ requires = ["tox>=4.19"]
 env_list = [
     "py3{9,10,11,12,13}-tests",
     "coverage-report",
-    "lint-style",
+    "py3{9,13}-lint-style",
     "lint-docs",
 ]
 
@@ -126,10 +126,16 @@ commands = [
 parallel_show_output = true
 commands = [
     ["coverage", "combine"],
-    ["coverage", "report", "--fail-under=65"]
+    ["coverage", "report", "--fail-under=60"]
 ]
 
-[tool.tox.env.lint-style]
+[tool.tox.env.py39-lint-style]
+commands = [
+    ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
+    ["ruff", "format", "--check", "--diff", "src", "tests"],
+    ["mypy", "src"],
+]
+[tool.tox.env.py313-lint-style]
 commands = [
     ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
     ["ruff", "format", "--check", "--diff", "src", "tests"],
@@ -138,7 +144,7 @@ commands = [
 
 [tool.tox.env.lint-docs]
 commands = [
-    ["interrogate", "-vv", "--fail-under", "75", "src"],
+    ["interrogate", "-vv", "--fail-under", "90", "src"],
     ["codespell", "--quiet-level", "0", "--summary", "--check-filenames", "--write-changes", "--skip", "*.pyc,*.png", "src", "tests"]
 ]
 

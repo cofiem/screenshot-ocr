@@ -20,8 +20,6 @@ logger = logging.getLogger(__name__)
 class DefaultPaths:
     """Provides default paths for known locations."""
 
-    is_win = sys.platform.startswith("win")
-
     def __init__(self, *, allow_not_exist: bool = False) -> None:
         """Create a new instance.
 
@@ -92,18 +90,8 @@ class DefaultPaths:
         Returns:
             The Tesseract executable file, if known.
         """
-        available = [
-            self._tesseract_exe_which_unix,
-            self._tesseract_exe_which_windows,
-            self._tesseract_exe_default_unix,
-            self._tesseract_exe_winreg,
-            self._tesseract_exe_default_win,
-        ]
-        for available_func in available:
-            result = available_func()
-            if result:
-                return result
-        return None
+        paths = self._tesseract_paths
+        return paths.get("exe_path", None)
 
     @functools.cached_property
     def tesseract_data_file(self) -> pathlib.Path | None:
@@ -112,138 +100,135 @@ class DefaultPaths:
         Returns:
             The Tesseract data directory, if known.
         """
-        available = [
-            self._tesseract_data_default_unix,
-            self._tesseract_data_winreg,
-            self._tesseract_data_default_win,
-        ]
-        for available_func in available:
-            result = available_func()
-            if result:
-                return result
-        return None
+        paths = self._tesseract_paths
+        return paths.get("data_path", None)
 
-    def _tesseract_exe_which_unix(self) -> pathlib.Path | None:
-        if self.is_win:
-            return None
-        exe_name = "tesseract"
-        result = shutil.which(exe_name)
-        if not result:
-            return None
+    @functools.cached_property
+    def _tesseract_paths(  # noqa: C901, PLR0912, PLR0915
+        self,
+    ) -> dict[str, pathlib.Path | None]:
+        # information to obtain
+        install_path = None
+        exe_path = None
+        data_path = None
 
-        return self._get_path(
-            "tesseract executable",
-            f"which {exe_name}",
-            pathlib.Path(result),
-        )
+        if sys.platform.startswith("linux"):
+            # Get exe from PATH.
+            if not exe_path:
+                available_exe1 = shutil.which("tesseract")
+                if available_exe1:
+                    available_path = pathlib.Path(available_exe1)
+                    if available_path.exists():
+                        exe_path = available_path.resolve()
+                        logger.debug(
+                            "Found tesseract exe path using Path at '%s'.", exe_path
+                        )
 
-    def _tesseract_exe_which_windows(self) -> pathlib.Path | None:
-        if not self.is_win:
-            return None
-        exe_name = "tesseract.exe"
-        result = shutil.which(exe_name)
-        if not result:
-            return None
+            # Get exe from default path.
+            if not exe_path:
+                available_exe2 = pathlib.Path("/usr/bin/tesseract")
+                if available_exe2:
+                    available_path = pathlib.Path(available_exe2)
+                    if available_path.exists():
+                        exe_path = available_path.resolve()
+                        logger.debug(
+                            "Found tesseract exe path using default at '%s'.", exe_path
+                        )
 
-        return self._get_path(
-            "tesseract executable",
-            f"which {exe_name}",
-            pathlib.Path(result),
-        )
+            # Get data from default path.
+            if not data_path:
+                available_data1 = pathlib.Path("/usr/share/tesseract-ocr/4.00/tessdata")
+                if available_data1:
+                    available_path = pathlib.Path(available_data1)
+                    if available_path.exists():
+                        data_path = available_path.resolve()
+                        logger.debug(
+                            "Found tesseract data path using default at '%s'.",
+                            data_path,
+                        )
 
-    def _tesseract_exe_default_unix(self) -> pathlib.Path | None:
-        if self.is_win:
-            return None
-        result = pathlib.Path("/usr/bin/tesseract")
-        return self._get_path(
-            "tesseract executable",
-            "default install path",
-            result,
-        )
+        elif sys.platform.startswith("win"):
+            # Get install dir using Windows default path.
+            if not install_path:
+                available_install1 = [
+                    os.environ.get("PROGRAMFILES"),
+                    os.environ.get("PROGRAMFILES(X86)"),
+                ]
+                for available_item in available_install1:
+                    if not available_item:
+                        continue
+                    available_path = pathlib.Path(available_item, "Tesseract-OCR")
+                    if available_path.exists():
+                        install_path = available_path
+                        logger.debug(
+                            "Found tesseract install path using Program Files at '%s'.",
+                            install_path,
+                        )
+                        break
 
-    def _tesseract_exe_winreg(self) -> pathlib.Path | None:
-        result = self._tesseract_install_dir_winreg()
-        if not result:
-            return None
-        return self._get_path(
-            "tesseract executable",
-            "Windows install information",
-            result,
-            "tesseract.exe",
-        )
+            # Get install path from Windows Registry.
+            if not install_path:
+                try:
+                    import winreg
 
-    def _tesseract_exe_default_win(self) -> pathlib.Path | None:
-        result = self._tesseract_install_dir_default()
-        if not result:
-            return None
-        return self._get_path(
-            "tesseract executable",
-            "default install path",
-            result,
-            "tesseract.exe",
-        )
+                    tree_root = winreg.HKEY_LOCAL_MACHINE
+                    tree_leaf = winreg.OpenKeyEx(
+                        tree_root, r"SOFTWARE\\Tesseract-OCR\\"
+                    )
+                    key_value, key_type = winreg.QueryValueEx(tree_leaf, "InstallDir")
+                    if tree_leaf:
+                        winreg.CloseKey(tree_leaf)
 
-    def _tesseract_data_default_unix(self) -> pathlib.Path | None:
-        if self.is_win:
-            return None
-        result = pathlib.Path("/usr/share/tesseract-ocr/4.00/tessdata")
-        return self._get_path(
-            "tesseract data",
-            "default install path",
-            result,
-        )
+                    if key_value and key_type == winreg.REG_SZ:
+                        available_path = pathlib.Path(key_value)
+                        if available_path.exists():
+                            install_path = available_path
+                            logger.debug(
+                                "Found tesseract install path using "
+                                "Windows Registry at '%s'.",
+                                install_path,
+                            )
 
-    def _tesseract_data_winreg(self) -> pathlib.Path | None:
-        result = self._tesseract_install_dir_winreg()
-        if not result:
-            return None
-        return self._get_path(
-            "tesseract data",
-            "Windows install information",
-            result,
-            "tessdata",
-        )
+                except ImportError:
+                    pass
 
-    def _tesseract_data_default_win(self) -> pathlib.Path | None:
-        result = self._tesseract_install_dir_default()
-        if not result:
-            return None
-        return self._get_path(
-            "tesseract data",
-            "default install path",
-            result,
-            "tessdata",
-        )
+            # Get exe from PATH.
+            if not exe_path:
+                available = shutil.which("tesseract.exe")
+                if available:
+                    available_path = pathlib.Path(available)
+                    if available_path.exists():
+                        exe_path = available_path.resolve()
+                        logger.debug(
+                            "Found tesseract exe path using Path at '%s'.", exe_path
+                        )
 
-    def _tesseract_install_dir_winreg(self) -> pathlib.Path | None:
-        try:
-            import winreg
+            # Get exe from install path.
+            if install_path and not exe_path:
+                available_path = install_path / "tesseract.exe"
+                if available_path.exists():
+                    exe_path = available_path.resolve()
+                    logger.debug(
+                        "Found tesseract exe path using install path at '%s'.", exe_path
+                    )
 
-            tree_root = winreg.HKEY_LOCAL_MACHINE
-            tree_leaf = winreg.OpenKeyEx(tree_root, r"SOFTWARE\\Tesseract-OCR\\")
-            key_value, key_type = winreg.QueryValueEx(tree_leaf, "InstallDir")
-            if tree_leaf:
-                winreg.CloseKey(tree_leaf)
+            # Get data from install path.
+            if install_path and not data_path:
+                available_path = install_path / "tessdata"
+                if available_path.exists():
+                    data_path = available_path.resolve()
+                    logger.debug(
+                        "Found tesseract data path using install path at '%s'.",
+                        data_path,
+                    )
+        else:
+            msg = f"Tesseract paths not implemented for '{sys.platform}'."
+            raise ValueError(msg)
 
-            if key_value and key_type == winreg.REG_SZ:
-                return pathlib.Path(key_value)
-
-        except ImportError:
-            pass
-
-        return None
-
-    def _tesseract_install_dir_default(self) -> pathlib.Path | None:
-        name = "Tesseract-OCR"
-        available = [
-            os.environ.get("PROGRAMFILES"),
-            os.environ.get("PROGRAMFILES(X86)"),
-        ]
-        for available_item in available:
-            if not available_item:
-                continue
-            return pathlib.Path(available_item, name)
-        return None
+        return {
+            "exe_path": exe_path,
+            "data_path": data_path,
+        }
 
     def _get_path(
         self,
