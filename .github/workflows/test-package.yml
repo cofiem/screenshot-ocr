@@ -118,7 +118,7 @@ jobs:
           pip install coverage
 
           # Combine the coverage from each Python version
-          coverage combine
+          coverage combine || true
           
           # Generate the html coverage report
           coverage html --skip-covered --skip-empty
