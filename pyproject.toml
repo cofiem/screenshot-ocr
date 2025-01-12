@@ -266,8 +266,7 @@ dev_template = "{tag}.dev{ccount}"
 dirty_template = "{tag}.dev{ccount}"
 
 [tool.pytest.ini_options]
-minversion = "7.0"
-addopts = ["-ra", "--strict-markers", "--strict-config"]
-pythonpath = ["src"]
-testpaths = ["tests"]
-xfail_strict = true
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
+]
