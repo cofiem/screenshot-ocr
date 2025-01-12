@@ -90,5 +90,5 @@ def test_app_paths_linux():
 
     assert tesseract_exe_file == pathlib.Path("/usr/bin/tesseract")
     assert tesseract_data_file == pathlib.Path(
-        "/usr/share/tesseract-ocr/4.00/tessdata/",
+        "/usr/share/tesseract-ocr/5/tessdata/",
     )

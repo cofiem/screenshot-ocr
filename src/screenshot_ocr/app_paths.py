@@ -137,7 +137,7 @@ class DefaultPaths:
 
             # Get data from default path.
             if not data_path:
-                available_data1 = pathlib.Path("/usr/share/tesseract-ocr/4.00/tessdata")
+                available_data1 = pathlib.Path("/usr/share/tesseract-ocr/5/tessdata")
                 if available_data1:
                     available_path = pathlib.Path(available_data1)
                     if available_path.exists():
