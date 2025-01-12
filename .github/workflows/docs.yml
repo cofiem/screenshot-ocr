@@ -33,15 +33,11 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install dependencies
-        run: >
-          pip install -U
-          -e .
-          -r requirements.txt
-          -r requirements-dev.txt
+      - name: Install hatch
+        run: pipx install hatch
 
       - name: Generate docs
-        run: pipx run tox run -e docs
+        run: hatch run docs:build
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3

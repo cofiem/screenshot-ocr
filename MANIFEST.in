@@ -1,4 +1,0 @@
-include VERSION
-include requirements.txt requirements-dev.txt
-include tests/conftest.py tests/helpers.py
-recursive-include tests/resources *

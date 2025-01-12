@@ -1,40 +1,27 @@
-# Screenshot OCR contributing guide
+# Contributing guide
 
 ## Development
 
-Create a virtual environment:
+Install `hatch`, e.g.
 
 ```bash
-python -m venv .venv
-```
-
-Install runtime dependencies and development dependencies:
-
-```bash
-# Windows
-.venv\Scripts\activate.ps1
-
-# Linux
-source .venv/bin/activate
-
-# install dependencies
-python -m pip install --upgrade pip tox build
+pipx install hatch
 ```
 
 ## Run tests and linters
 
-Run the tests and linters with multiple python versions using tox.
+Run the tests and linters with multiple python versions.
 
 To run using all available python versions:
 
 ```bash
-python -X dev -m tox run -e ALL
+hatch run all:test
 ```
 
-To run using the active python:
+To run using a particular Python version available in the hatch matrix:
 
 ```bash
-python -X dev -m tox -e py
+hatch run +py=3.11 all:test
 ```
 
 ## Test a release locally
@@ -42,10 +29,10 @@ python -X dev -m tox -e py
 Generate the distribution package archives.
 
 ```bash
-python -X dev -m build
+hatch build
 ```
 
-Then create a new virtual environment, install the dependencies, and install from the local wheelTest PyPI.
+Then create a new virtual environment, install the dependencies, and install from the local wheel.
 
 ```bash
 rm -rf .venv-test
@@ -54,10 +41,10 @@ source .venv-test/bin/activate
 
 python -m pip install --upgrade pip
 
-pip install dist/screenshot_ocr-$SCREENSHOT_OCR_VERSION-py3-none-any.whl
+pip install dist/*.whl
 ```
 
-Test the installed package.
+## Test the installed package
 
 ```bash
 screenshot-ocr --version
@@ -96,28 +83,17 @@ ValueError: Client secrets must be for a web or installed app.
 
 If the package seems to work as expected, push changes to the `main` branch.
 
-Push changes to the `main` branch.
 The `pypi-package.yml` GitHub Actions workflow will deploy a release to Test PyPI.
 
-Then follow the same process as testing a release locally, except install from Test PyPI.
+Then follow the same process as testing a release locally, 
+except download the wheel from Test PyPI instead of using the local wheel file.
 
-```bash
-rm -rf .venv-test
-python -m venv .venv-test
-source .venv-test/bin/activate
-
-python -m pip install --upgrade pip
-
-# use the requirements file to install dependencies from the production PyPI,
-# as the packages may not be on Test PyPI, or they might be different (potentially malicious!) packages.
-python -m pip install --upgrade -r requirements.txt
-
-pip install --index-url https://test.pypi.org/simple/ --no-deps screenshot-ocr==$SCREENSHOT_OCR_VERSION
-```
+Go to the [test project page](https://test.pypi.org/project/screenshot-ocr) and check that it looks ok.
 
 ## Create a release to PyPI
 
 Create a tag on the `main` branch.
+
 The `pypi-package.yml` GitHub Actions workflow will deploy a release to PyPI.
 
 Go to the [live project page](https://pypi.org/project/screenshot-ocr) and check that it looks ok.

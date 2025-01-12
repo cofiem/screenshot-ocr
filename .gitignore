@@ -133,3 +133,11 @@ dmypy.json
 .idea/
 
 docs/
+
+.hatch
+.env*
+
+.coverage*
+
+embed/
+support/

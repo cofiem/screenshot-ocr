@@ -6,8 +6,6 @@ documentation:
 dependencies:
   - changed-files:
       - any-glob-to-any-file:
-          - requirements.txt
-          - requirements-dev.txt
           - pyproject.toml
           - MANIFEST.in
 

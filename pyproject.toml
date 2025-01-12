@@ -1,15 +1,20 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [build-system]
-requires = ["setuptools>=67.0.0", "wheel", "setuptools-git-versioning>=2.0,<3"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "screenshot-ocr"
 description = "Extract text from screenshots."
+dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.9"
+license = "Apache-2.0"
 keywords = ["ocr", "screenshot", "spreadsheet"]
+authors = [
+    { name = "Mark C", email = "cofiem@gmail.com" },
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: Apache Software License",
@@ -27,31 +32,223 @@ classifiers = [
     "Topic :: Utilities",
     "Intended Audience :: End Users/Desktop",
 ]
-dynamic = [
-    "version",
-    "dependencies",
-    "optional-dependencies",
+dependencies = [
+    "click==8.1.8",
+    # google sheets api
+    "google-api-python-client==2.151.0",
+    "google-auth-httplib2==0.2.0",
+    "google-auth-oauthlib==1.2.1",
+    # files
+    "platformdirs==4.3.6",
+    # compatibility
+    # (version spec is 'greater than' instead of 'specific version' due to different versions used by dependencies)
+    "importlib_resources>=5",
+    "importlib_metadata>=6",
+    "typing-extensions>=4",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/cofiem/screenshot-ocr"
-"Changelog" = "https://github.com/cofiem/screenshot-ocr/blob/main/CHANGELOG.md"
-"Source" = "https://github.com/cofiem/screenshot-ocr"
-"Tracker" = "https://github.com/cofiem/screenshot-ocr/issues"
+Documentation = "https://github.com/cofiem/screenshot-ocr#readme"
+Issues = "https://github.com/cofiem/screenshot-ocr/issues"
+Source = "https://github.com/cofiem/screenshot-ocr"
+Changelog = "https://github.com/cofiem/screenshot-ocr/blob/main/CHANGELOG.md"
 
 [project.scripts]
-screenshot-ocr = 'screenshot_ocr.cli:main'
+screenshot-ocr = 'screenshot_ocr.cli:screenshot_ocr'
 
-[tool.setuptools.packages.find]
-where = ["src"]
-# include and exclude accept strings representing glob patterns.
-include = ["screenshot_ocr*"]
+[tool.hatch.version]
+path = "src/screenshot_ocr/__about__.py"
 
-[tool.setuptools.dynamic]
-dependencies = { file = ["requirements.txt"] }
 
-[tool.setuptools.dynamic.optional-dependencies]
-dev = { file = ["requirements-dev.txt"] }
+[tool.hatch.envs.default]
+dependencies = [
+    "coverage[toml]>=6.5",
+    "pytest",
+    "pytest-mock",
+    "pytest-cov",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+    "- coverage combine",
+    "coverage report",
+]
+cov = [
+    "test-cov",
+    "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+
+
+[tool.hatch.envs.types]
+dependencies = [
+    "mypy>=1.0.0",
+    "types-dateparser",
+    "types-PyYAML",
+    "types-requests",
+    "types-backports",
+    "types-urllib3",
+    "types-cachetools",
+    "types-pyOpenSSL",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/screenshot_ocr tests}"
+
+[tool.hatch.envs.hatch-static-analysis]
+dependencies = [
+    "ruff==0.8.4",
+]
+config-path = "none"
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "pdoc",
+    "codespell",
+    "interrogate",
+]
+[tool.hatch.envs.docs.scripts]
+build = """
+pdoc --docformat google \
+--edit-url screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/ \
+--search \
+--show-source \
+--output-directory docs \
+./src/screenshot_ocr
+"""
+
+lint-interrogate = "interrogate -vv --fail-under 90 src"
+lint-codespell = "codespell --quiet-level 0 --summary --check-filenames --write-changes --skip *.pyc,*.png src tests"
+lint = [
+    "lint-interrogate",
+    "lint-codespell",
+]
+
+
+[tool.coverage.run]
+source_pkgs = ["screenshot_ocr", "tests"]
+branch = true
+parallel = true
+omit = [
+    "src/screenshot_ocr/__about__.py",
+]
+
+
+[tool.coverage.paths]
+screenshot_ocr = ["src/screenshot_ocr", "*/screenshot-ocr/src/screenshot_ocr"]
+tests = ["tests", "*/screenshot-ocr/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+show-fixes = true
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hatch",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+select = ["ALL"]
+ignore = [
+    "COM812",
+    "ISC001",
+    "D203", # one-blank-line-before-class
+    "D213", # multi-line-summary-second-line
+    "TD", # to do checks
+    "D", # doc strings
+    "ANN", # type annotations
+    "ERA001", # Found commented-out code
+
+    "TRY300", # don't want to move returns to else block
+    "ANN003", # don't want to annotate kwargs
+    "RET504", # assignments before return can be useful
+    "ERA001", # ignore commented code
+    "TD", # don't worry about todos format
+    "FIX002", # todos are ok
+    "COM812",
+    "ISC001",
+]
+
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S", # lots of things not usually allowed can be used in test code
+    "ANN", # don't worry about typing in tests
+    "D", # ignore docstrings in tests
+]
+
+[tool.ruff.lint.isort]
+lines-between-types = 1
+lines-after-imports = 2
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+
+[tool.mypy]
+strict = true
+pretty = true
+ignore_missing_imports = true
+check_untyped_defs = true
+no_implicit_optional = true
+show_error_codes = true
+
 
 [tool.setuptools-git-versioning]
 enabled = true
@@ -66,131 +263,3 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 pythonpath = ["src"]
 testpaths = "tests"
 xfail_strict = true
-
-[tool.coverage.run]
-parallel = true
-branch = true
-source = ['screenshot_ocr']
-
-[tool.coverage.paths]
-source = ["src", ".tox/py*/**/site-packages"]
-
-[tool.coverage.report]
-show_missing = true
-skip_covered = true
-
-[tool.coverage.html]
-skip_covered = true
-skip_empty = true
-
-[tool.ruff.lint.isort]
-lines-between-types = 1
-lines-after-imports = 2
-
-[tool.tox]
-requires = ["tox>=4.19"]
-env_list = [
-    "py3{9,10,11,12,13}-tests",
-    "coverage-report",
-    "py3{9,13}-lint-style",
-    "lint-docs",
-    "docs",
-]
-
-[tool.tox.env_run_base]
-package = "wheel"
-wheel_build_env = ".pkg"
-extras = ["dev"]
-
-[tool.tox.env.py39-tests]
-commands = [
-    ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
-]
-[tool.tox.env.py310-tests]
-commands = [
-    ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
-]
-[tool.tox.env.py311-tests]
-commands = [
-    ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
-]
-[tool.tox.env.py312-tests]
-commands = [
-    ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
-]
-[tool.tox.env.py313-tests]
-commands = [
-    ["python", "-X", "dev", "-m", "coverage", "run", "-m", "pytest", "{posargs}"],
-]
-
-[tool.tox.env.coverage-report]
-parallel_show_output = true
-commands = [
-    ["coverage", "combine"],
-    ["coverage", "report", "--fail-under=60"]
-]
-
-[tool.tox.env.py39-lint-style]
-commands = [
-    ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
-    ["ruff", "format", "--check", "--diff", "src", "tests"],
-    ["mypy", "src"],
-]
-[tool.tox.env.py313-lint-style]
-commands = [
-    ["ruff", "check", "--fix", "--exit-non-zero-on-fix", "src", "tests"],
-    ["ruff", "format", "--check", "--diff", "src", "tests"],
-    ["mypy", "src"],
-]
-
-[tool.tox.env.lint-docs]
-commands = [
-    ["interrogate", "-vv", "--fail-under", "90", "src"],
-    ["codespell", "--quiet-level", "0", "--summary", "--check-filenames", "--write-changes", "--skip", "*.pyc,*.png", "src", "tests"]
-]
-
-[tool.tox.env.docs]
-commands = [
-    ["pdoc",
-        "--docformat", "google",
-        "--edit-url", "screenshot_ocr=https://github.com/cofiem/screenshot-ocr/blob/main/src/screenshot_ocr/",
-        "--search", "--show-source", "--output-directory", "docs", "./src/screenshot_ocr"
-    ]
-]
-
-
-[tool.mypy]
-strict = true
-pretty = true
-ignore_missing_imports = true
-check_untyped_defs = true
-no_implicit_optional = true
-show_error_codes = true
-
-[tool.ruff]
-line-length = 88
-show-fixes = true
-src = ["src", "tests"]
-
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = [
-    "TRY300", # don't want to move returns to else block
-    "ANN003", # don't want to annotate kwargs
-    "RET504", # assignments before return can be useful
-    "ERA001", # ignore commented code
-    "TD", # don't worry about todos format
-    "FIX002", # todos are ok
-    "COM812",
-    "ISC001",
-]
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = [
-    "S", # lots of things not usually allowed can be used in test code
-    "ANN", # don't worry about typing in tests
-    "D", # ignore docstrings in tests
-]

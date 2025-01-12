@@ -48,14 +48,9 @@ jobs:
       fail-fast: false
       matrix:
         # TODO: add tests for 'Windows' and 'macOS'. Need to install Tesseract.
-        os:
-          - ubuntu
-#          - windows
+        os: ["ubuntu"]
         # Created by the build-and-inspect-python-package action above.
         python-version: ${{ fromJson(needs.build-package.outputs.python-versions) }}
-
-    env:
-      PYTHON: ${{ matrix.python-version }}
 
     steps:
       - name: Download pre-built packages
@@ -84,8 +79,11 @@ jobs:
         if: matrix.os == 'windows'
         run: choco install tesseract
 
+      - name: Install hatch
+        run: pipx install hatch
+
       - name: Run tests
-        run: pipx run tox run --installpkg dist/*.whl -f py${PYTHON//./}-tests
+        run: hatch run cov
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -110,7 +108,7 @@ jobs:
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: 3.13
+          python-version: "3.13"
           cache: pip
           allow-prereleases: true
 
@@ -154,13 +152,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu
-        # - windows
+        os: ["ubuntu"]
         python-version: ["3.13", "3.9"]
-
-    env:
-      PYTHON: ${{ matrix.python-version }}
 
     steps:
       - name: Download pre-built packages
@@ -179,9 +172,12 @@ jobs:
           cache: pip
           allow-prereleases: true
 
+      - name: Install hatch
+        run: pipx install hatch
+
       - name: Lint style
-        run: pipx run tox run --installpkg dist/*.whl -f py${PYTHON//./}-lint-style
+        run: hatch fmt --check
 
       - name: Lint docs
         if: matrix.python-version == '3.13'
-        run: pipx run tox run --installpkg dist/*.whl -e lint-docs
+        run: hatch run docs:lint

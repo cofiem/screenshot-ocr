@@ -3,9 +3,10 @@ import pathlib
 import tempfile
 import uuid
 
+from click.testing import CliRunner
 from importlib_resources import files
 
-from screenshot_ocr import cli
+from screenshot_ocr.cli import screenshot_ocr
 
 
 def test_tesseract_extract(
@@ -47,9 +48,10 @@ def test_tesseract_extract(
 
         google_token = google_dir / "token.json"
 
-        result = cli.main(
+        runner = CliRunner()
+        result = runner.invoke(
+            screenshot_ocr,
             [
-                spreadsheet_id,
                 "--input-dir",
                 str(input_dir),
                 "--output-dir",
@@ -59,15 +61,18 @@ def test_tesseract_extract(
                 "--google-token",
                 str(google_token),
                 "--no-move-images",
+                spreadsheet_id,
             ],
         )
 
     # assert
-    assert result == 1
+    expected_code = 0
+    assert result.exit_code == expected_code
 
     cap_stdout, cap_stderr = capsys.readouterr()
     assert cap_stderr == ""
     equal_ignore_whitespace(cap_stdout, "")
+    assert result.output == ""
     assert caplog.record_tuples == [
         ("screenshot_ocr.app", 20, "Starting Screenshot OCR."),
         (

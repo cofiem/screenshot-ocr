@@ -38,13 +38,10 @@ jobs:
           cache: pip
           allow-prereleases: true
 
-      - name: Install dependencies
+      - name: Install app
         run: |
-          echo "::group::Pip dependencies"
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install --upgrade -r requirements-dev.txt -r requirements.txt
+          python -m pip install --upgrade pip
           python -m pip install .
-          echo "::endgroup::"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -58,4 +55,4 @@ jobs:
         uses: pypa/gh-action-pip-audit@v1.1.0
         continue-on-error: true
         with:
-          inputs: requirements.txt requirements-dev.txt
+          inputs: '.'
