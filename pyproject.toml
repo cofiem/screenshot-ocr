@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -58,7 +58,11 @@ screenshot-ocr = 'screenshot_ocr.cli:screenshot_ocr'
 
 [tool.hatch.version]
 path = "src/screenshot_ocr/__about__.py"
+source = "vcs"
+version_scheme = "no-guess-dev"
 
+[tool.hatch.build.hooks.vcs]
+version-file = "_version.py"
 
 [tool.hatch.envs.default]
 dependencies = [
