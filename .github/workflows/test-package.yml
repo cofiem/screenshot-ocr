@@ -26,12 +26,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: hynek/build-and-inspect-python-package@c52c3a4710070b50470d903818a7b25115dcd076
+      - name: Build and Inspect Python
+        uses: hynek/build-and-inspect-python-package@c52c3a4710070b50470d903818a7b25115dcd076 # v2.13.0
         id: baipp
 
     outputs:
@@ -48,22 +49,23 @@ jobs:
       fail-fast: false
       matrix:
         # TODO: add tests for 'Windows' and 'macOS'. Need to install Tesseract.
-        os: ["ubuntu"]
+        os:
+          - ubuntu
         # Created by the build-and-inspect-python-package action above.
         python-version: ${{ fromJson(needs.build-package.outputs.python-versions) }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          allow-prereleases: true
+
 
       - name: Install Ubuntu dependencies
         if: matrix.os == 'ubuntu'
@@ -74,13 +76,15 @@ jobs:
         run: choco install tesseract
 
       - name: Install hatch
-        run: pipx install hatch
+        run: |
+          pipx install hatch
+          pipx inject hatch click==8.2.2 --force
 
       - name: Run tests
         run: hatch run cov
 
       - name: Upload coverage data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage-data-${{ matrix.os }}-${{ matrix.python-version }}
           path: .coverage*
@@ -95,19 +99,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: "3.13"
           cache: pip
-          allow-prereleases: true
 
       - name: Download coverage data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -130,7 +133,7 @@ jobs:
           coverage report --fail-under=60
 
       - name: Upload HTML report if coverage under expected percentage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: html-report
           path: htmlcov
@@ -151,7 +154,7 @@ jobs:
 
     steps:
       - name: Download pre-built packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: Packages
           path: dist
@@ -160,14 +163,15 @@ jobs:
         run: tar xf dist/*.tar.gz --strip-components=1
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          allow-prereleases: true
 
       - name: Install hatch
-        run: pipx install hatch
+        run: |
+          pipx install hatch
+          pipx inject hatch click==8.2.2 --force
 
       - name: Lint style
         run: hatch fmt --check || true
