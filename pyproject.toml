@@ -34,7 +34,7 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
 ]
 dependencies = [
-    "click==8.1.8",
+    "click==8.3.0",
     # google sheets api
     "google-api-python-client==2.181.0",
     "google-auth-httplib2==0.2.0",
