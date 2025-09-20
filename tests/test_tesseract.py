@@ -5,7 +5,6 @@ import uuid
 
 from click.testing import CliRunner
 from importlib_resources import files
-
 from screenshot_ocr.cli import screenshot_ocr
 
 

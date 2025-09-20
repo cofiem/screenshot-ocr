@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import logging
-
 from typing import TYPE_CHECKING
 
 from google.auth.transport import requests
 from google.oauth2 import credentials
 from google_auth_oauthlib import flow
 from googleapiclient import discovery, errors
-
 
 if TYPE_CHECKING:
     import pathlib

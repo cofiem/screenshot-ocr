@@ -6,7 +6,6 @@ import logging
 import subprocess
 import typing
 
-
 if typing.TYPE_CHECKING:
     import pathlib
 
@@ -42,7 +41,7 @@ class OcrHelper:
             str(image_file),
             "stdout",
         ]
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(
             cmds,
             check=True,
             capture_output=True,

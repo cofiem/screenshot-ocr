@@ -7,7 +7,6 @@ import logging
 from importlib_metadata import PackageNotFoundError, distribution
 from importlib_resources import as_file, files
 
-
 logger = logging.getLogger(__name__)
 
 

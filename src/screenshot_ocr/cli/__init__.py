@@ -8,7 +8,6 @@ import click
 from screenshot_ocr import app, utils
 from screenshot_ocr.__about__ import __version__
 
-
 overall_log_level = logging.DEBUG
 default_app_log_level = logging.DEBUG
 default_app_log_level_str = logging.getLevelName(default_app_log_level)

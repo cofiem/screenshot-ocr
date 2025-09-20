@@ -3,7 +3,6 @@ import pathlib
 import sys
 
 import pytest
-
 from screenshot_ocr import utils
 from screenshot_ocr.app_paths import DefaultPaths
 from tests.helpers import normalise_path

@@ -1,5 +1,4 @@
 from click.testing import CliRunner
-
 from screenshot_ocr.cli import screenshot_ocr
 
 

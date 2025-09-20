@@ -5,13 +5,11 @@ from __future__ import annotations
 import dataclasses
 import logging
 import shutil
-
 from typing import TYPE_CHECKING, TypedDict
 
 from typing_extensions import Unpack
 
 from screenshot_ocr import app_paths, google_sheets, ocr, trivia, utils
-
 
 if TYPE_CHECKING:
     import pathlib

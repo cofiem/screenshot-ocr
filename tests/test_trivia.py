@@ -1,9 +1,7 @@
 import datetime
 
 import pytest
-
 from screenshot_ocr.trivia import TriviaHelper
-
 
 example_1_longer_question = "QUESTION 15"
 example_1_longer_text = """

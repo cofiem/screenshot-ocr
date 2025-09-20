@@ -10,9 +10,7 @@ import shutil
 import sys
 
 import platformdirs
-
 from screenshot_ocr import utils
-
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +102,7 @@ class DefaultPaths:
         return paths.get("data_path", None)
 
     @functools.cached_property
-    def _tesseract_paths(  # noqa: C901, PLR0912, PLR0915
+    def _tesseract_paths(
         self,
     ) -> dict[str, pathlib.Path | None]:
         # information to obtain

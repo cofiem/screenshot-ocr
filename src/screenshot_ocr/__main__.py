@@ -2,7 +2,6 @@
 
 import sys
 
-
 if __name__ == "__main__":
     from screenshot_ocr.cli import screenshot_ocr
 
