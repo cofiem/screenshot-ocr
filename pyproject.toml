@@ -94,7 +94,7 @@ python = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.hatch.envs.types]
 dependencies = [
-    "mypy>=1.0.0",
+    "mypy==1.17.1",
     "types-dateparser",
     "types-PyYAML",
     "types-requests",
@@ -108,7 +108,7 @@ check = "mypy --install-types --non-interactive {args:src/screenshot_ocr tests}"
 
 [tool.hatch.envs.hatch-static-analysis]
 dependencies = [
-    "ruff==0.8.4",
+    "ruff==0.12.9",
 ]
 config-path = "none"
 
