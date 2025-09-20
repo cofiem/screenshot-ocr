@@ -34,7 +34,9 @@ jobs:
           python-version: '3.13'
 
       - name: Install hatch
-        run: pipx install hatch
+        run: |
+          pipx install hatch
+          pipx inject hatch click==8.2.2 --force
 
       - name: Generate docs
         run: hatch run docs:build

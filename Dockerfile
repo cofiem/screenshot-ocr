@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python -m pip install hatch
+RUN python -m pip install hatch click==8.2.2
 
 COPY . .
 
