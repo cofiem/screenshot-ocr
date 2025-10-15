@@ -1,4 +1,4 @@
-FROM python:3.12@sha256:1cb6108b64a4caf2a862499bf90dc65703a08101e8bfb346a18c9d12c0ed5b7e
+FROM python:3.14@sha256:e3a6ccbe44d9cbfa4f107f238a0e95fa70e0d084e87689222e951d062ac89854
 
 RUN apt-get update && \
     apt-get install -y tesseract-ocr tesseract-ocr-eng && \
