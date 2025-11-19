@@ -37,7 +37,7 @@ dependencies = [
     "click==8.3.1",
     # google sheets api
     "google-api-python-client==2.187.0",
-    "google-auth-httplib2==0.2.0",
+    "google-auth-httplib2==0.2.1",
     "google-auth-oauthlib==1.2.3",
     # files
     "platformdirs==4.4.0",
