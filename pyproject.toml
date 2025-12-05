@@ -40,7 +40,7 @@ dependencies = [
     "google-auth-httplib2==0.2.1",
     "google-auth-oauthlib==1.2.3",
     # files
-    "platformdirs==4.5.0",
+    "platformdirs==4.5.1",
     # compatibility
     # (version spec is 'greater than' instead of 'specific version' due to different versions used by dependencies)
     "importlib_resources>=5",
