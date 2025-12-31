@@ -34,13 +34,13 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
 ]
 dependencies = [
-    "click==8.1.8",
+    "click==8.3.1",
     # google sheets api
-    "google-api-python-client==2.182.0",
-    "google-auth-httplib2==0.2.0",
-    "google-auth-oauthlib==1.2.2",
+    "google-api-python-client==2.187.0",
+    "google-auth-httplib2==0.3.0",
+    "google-auth-oauthlib==1.2.3",
     # files
-    "platformdirs==4.4.0",
+    "platformdirs==4.5.1",
     # compatibility
     # (version spec is 'greater than' instead of 'specific version' due to different versions used by dependencies)
     "importlib_resources>=5",
